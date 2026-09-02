@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "vue", "vitest"],
+  "categories": {
+    "correctness": "deny"
+  },
+  "rules": {},
+  "ignorePatterns": [
+    ".output",
+    ".nuxt",
+    ".data",
+    ".nitro",
+    ".cache",
+    "dist",
+    "node_modules",
+    "public"
+  ]
+}

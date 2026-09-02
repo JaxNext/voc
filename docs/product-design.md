@@ -26,6 +26,7 @@ A web app that helps English learners **capture** English sentences, phrases, an
 **User story:** Register and log in/log out to keep personal records private and synced across devices.
 
 Features:
+
 - Register (email + password, with email verification)
 - Login / Logout
 - Password reset
@@ -38,15 +39,16 @@ Features:
 **User story:** Input a sentence, phrase, or word as a record.
 
 **Fields:**
-| Field | Required | Notes |
-|---|---|---|
-| Content | Yes | The sentence / phrase / word itself |
-| Type | Yes | `sentence` / `phrase` / `word` |
-| Meaning | Yes | Translation or explanation (manual input for now) |
-| Source | No | Where it was encountered (video, article, conversation, book…) |
-| Notes | No | Usage tips, collocations, personal memory hooks |
-| Tags | No | Predefined tags + user-created custom tags (see 3.4) |
-| Example sentence | No | *(Nice-to-have; can defer to later phase)* |
+
+| Field            | Required | Notes                                                          |
+| ---------------- | -------- | -------------------------------------------------------------- |
+| Content          | Yes      | The sentence / phrase / word itself                            |
+| Type             | Yes      | `sentence` / `phrase` / `word`                                 |
+| Meaning          | Yes      | Translation or explanation (manual input for now)              |
+| Source           | No       | Where it was encountered (video, article, conversation, book…) |
+| Notes            | No       | Usage tips, collocations, personal memory hooks                |
+| Tags             | No       | Predefined tags + user-created custom tags (see 3.4)           |
+| Example sentence | No       | _(Nice-to-have; can defer to later phase)_                     |
 
 ---
 
@@ -55,11 +57,12 @@ Features:
 **User story:** View, edit, and delete records.
 
 Features:
+
 - **Record list**: chronological (newest first), paginated or infinite scroll
 - **Detail view**: full record with all fields
 - **Edit** any field
 - **Delete** (with confirmation)
-- **Bulk delete** *(later)*
+- **Bulk delete** _(later)_
 
 ---
 
@@ -68,11 +71,12 @@ Features:
 **User story:** Find a specific record quickly as the library grows.
 
 Features:
+
 - **Keyword search** over content and meaning
 - **Filter** by type (sentence/phrase/word) and tag
 - **Sort**: newest / oldest / alphabetical
 - **Tag management**: a predefined tag set (e.g. `work`, `daily`, `idiom`, `travel`) plus ability to create custom tags
-- *(Later)* Filter by learning status and by "not yet reviewed"
+- _(Later)_ Filter by learning status and by "not yet reviewed"
 
 ---
 
@@ -81,6 +85,7 @@ Features:
 **User story:** Review saved items in a structured, memory-friendly way.
 
 Features:
+
 - **Flashcard mode**: show the content, user recalls the meaning, tap to reveal
 - **Self-grading**: mark as `Forgot` / `Hazy` / `Know` / `Easy`
 - **Learning status**: `New` → `Learning` → `Mastered`
@@ -89,6 +94,7 @@ Features:
 - **Today's review queue**: "N items due today" — the daily anchor that brings users back
 
 **Decisions:**
+
 - SRS starts in V2 with simple fixed intervals based on self-grade; the algorithm can be refined in V3.
 
 ---
@@ -98,8 +104,9 @@ Features:
 **User story:** Feel a sense of progress and stay motivated.
 
 Features:
+
 - **Stats dashboard**: total records, mastered count, days reviewed in a row (streak)
-- **Random pick / word of the day** *(later)*
+- **Random pick / word of the day** _(later)_
 
 ---
 
@@ -108,29 +115,30 @@ Features:
 **User story:** Own my data.
 
 Features:
-- **Export** records to JSON *(V3)*
+
+- **Export** records to JSON _(V3)_
 
 ---
 
 ## 4. Phasing
 
-| Phase | Scope |
-|---|---|
+| Phase   | Scope                                                                                                                                 |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | **MVP** | Auth (register/login/logout, email verification, password reset), record CRUD, record list, search & filter, predefined + custom tags |
-| **V2** | Review mode (flashcards + self-grade + learning status), session-based review queue, basic stats (counts, streak) |
-| **V3** | Spaced repetition refinement, JSON export, random pick, advanced stats |
+| **V2**  | Review mode (flashcards + self-grade + learning status), session-based review queue, basic stats (counts, streak)                     |
+| **V3**  | Spaced repetition refinement, JSON export, random pick, advanced stats                                                                |
 
 ---
 
 ## 5. Key Decisions
 
-| Topic | Decision |
-|---|---|
-| Password reset & email verification | In MVP |
-| Tag UX | Predefined tags + custom tags |
-| Review session style | Session-based (fixed number of items per session) |
-| Data export | JSON only |
-| SRS algorithm | Start simple (fixed intervals) in V2, refine in V3 |
+| Topic                               | Decision                                           |
+| ----------------------------------- | -------------------------------------------------- |
+| Password reset & email verification | In MVP                                             |
+| Tag UX                              | Predefined tags + custom tags                      |
+| Review session style                | Session-based (fixed number of items per session)  |
+| Data export                         | JSON only                                          |
+| SRS algorithm                       | Start simple (fixed intervals) in V2, refine in V3 |
 
 ---
 

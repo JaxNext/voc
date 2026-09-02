@@ -4,16 +4,16 @@
 
 ## 1. Stack Overview
 
-| Layer | Choice |
-|---|---|
-| Language | TypeScript |
-| Framework (frontend + backend) | **Nuxt 4** (Vue 3 + Nitro server engine) |
-| Toolchain | **VoidZero** ecosystem: Vite (Rolldown-powered) bundler, **oxlint** for linting, pnpm for packages |
-| Database & Auth | **Supabase Cloud** (hosted Postgres + **Supabase Auth**) |
-| UI | **Nuxt UI** (Vue components + Tailwind CSS, dark mode, responsive) |
-| PWA | `@vite-pwa/nuxt` (manifest, service worker, installable) |
-| Deployment | **Cloudflare Pages** (Nitro preset `cloudflare_pages`) |
-| Package manager | pnpm (workspace-ready) |
+| Layer                          | Choice                                                                                             |
+| ------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Language                       | TypeScript                                                                                         |
+| Framework (frontend + backend) | **Nuxt 4** (Vue 3 + Nitro server engine)                                                           |
+| Toolchain                      | **VoidZero** ecosystem: Vite (Rolldown-powered) bundler, **oxlint** for linting, pnpm for packages |
+| Database & Auth                | **Supabase Cloud** (hosted Postgres + **Supabase Auth**)                                           |
+| UI                             | **Nuxt UI** (Vue components + Tailwind CSS, dark mode, responsive)                                 |
+| PWA                            | `@vite-pwa/nuxt` (manifest, service worker, installable)                                           |
+| Deployment                     | **Cloudflare Pages** (Nitro preset `cloudflare_pages`)                                             |
+| Package manager                | pnpm (workspace-ready)                                                                             |
 
 ### Why this shape
 
@@ -120,13 +120,13 @@ voc/
 
 ## 4. Toolchain (VoidZero)
 
-| Tool | Role | Notes |
-|---|---|---|
-| pnpm | Package manager | Fast, strict, workspace-ready |
+| Tool                            | Role                 | Notes                                                                              |
+| ------------------------------- | -------------------- | ---------------------------------------------------------------------------------- |
+| pnpm                            | Package manager      | Fast, strict, workspace-ready                                                      |
 | **Vite** (Nuxt default builder) | Bundler / dev server | Nuxt 4 ships Vite; can opt into **Rolldown-Vite** (Rust bundler) for faster builds |
-| **oxlint** | Linter | oxc-based, ~50× faster than ESLint; runs in CI and `pre-commit` |
-| TypeScript | Types | Strict mode; Zod for runtime validation at API boundaries |
-| Prettier | Formatter | Stable formatting (oxc formatter can replace later when GA) |
+| **oxlint**                      | Linter               | oxc-based, ~50× faster than ESLint; runs in CI and `pre-commit`                    |
+| TypeScript                      | Types                | Strict mode; Zod for runtime validation at API boundaries                          |
+| Prettier                        | Formatter            | Stable formatting (oxc formatter can replace later when GA)                        |
 
 > Note: oxlint's Vue SFC support is still maturing — if template linting is needed later, add `eslint-plugin-vue` alongside. For MVP, oxlint on `*.ts` + Prettier is sufficient.
 
@@ -241,16 +241,20 @@ Email sending uses Supabase's built-in SMTP; a custom sender (Resend/SendGrid) c
 ### SRS interval math — `server/utils/srs.ts` (pure, unit-testable)
 
 ```ts
-type Grade = 'forgot' | 'hazy' | 'know' | 'easy';
+type Grade = 'forgot' | 'hazy' | 'know' | 'easy'
 
-const INTERVALS = [0, 1, 3, 7, 14, 30]; // multiplier ladder
+const INTERVALS = [0, 1, 3, 7, 14, 30] // multiplier ladder
 
 function nextInterval(current: number, grade: Grade): number {
   switch (grade) {
-    case 'forgot': return 1;            // reset
-    case 'hazy':   return Math.max(1, Math.round(current / 2));
-    case 'know':   return INTERVALS[Math.min(INTERVALS.length - 1, INTERVALS.indexOf(current) + 1)];
-    case 'easy':   return Math.min(30, Math.round(current * 3));
+    case 'forgot':
+      return 1 // reset
+    case 'hazy':
+      return Math.max(1, Math.round(current / 2))
+    case 'know':
+      return INTERVALS[Math.min(INTERVALS.length - 1, INTERVALS.indexOf(current) + 1)]
+    case 'easy':
+      return Math.min(30, Math.round(current * 3))
   }
 }
 ```
@@ -280,12 +284,12 @@ function nextInterval(current: number, grade: Grade): number {
 
 ## 9. API Summary (Nitro routes only — the rest is direct Supabase)
 
-| Method & Path | Purpose |
-|---|---|
-| `GET /api/review/session` | Build today's review session (due items, N=10) |
-| `POST /api/review/grade` | Apply grade → update SRS state + log event |
-| `GET /api/stats` | Streak, counts, weekly activity |
-| (CRUD: direct Supabase calls from client with RLS) | |
+| Method & Path                                      | Purpose                                        |
+| -------------------------------------------------- | ---------------------------------------------- |
+| `GET /api/review/session`                          | Build today's review session (due items, N=10) |
+| `POST /api/review/grade`                           | Apply grade → update SRS state + log event     |
+| `GET /api/stats`                                   | Streak, counts, weekly activity                |
+| (CRUD: direct Supabase calls from client with RLS) |                                                |
 
 ---
 
@@ -313,35 +317,35 @@ function nextInterval(current: number, grade: Grade): number {
 
 ## 12. Testing & Quality
 
-| Level | Tool | Scope |
-|---|---|---|
-| Unit | **Vitest** | `srs.ts` interval math, Zod schemas |
-| Component | Vue Test Utils + Vitest | `RecordForm`, `Flashcard` |
-| E2E | **Playwright** | login → add record → review flow |
-| Lint | **oxlint** + Prettier | pre-commit hook (lint-staged) |
+| Level     | Tool                    | Scope                               |
+| --------- | ----------------------- | ----------------------------------- |
+| Unit      | **Vitest**              | `srs.ts` interval math, Zod schemas |
+| Component | Vue Test Utils + Vitest | `RecordForm`, `Flashcard`           |
+| E2E       | **Playwright**          | login → add record → review flow    |
+| Lint      | **oxlint** + Prettier   | pre-commit hook (lint-staged)       |
 
 ---
 
 ## 13. Phasing (maps to product design §4)
 
-| Phase | Tech work |
-|---|---|
-| **Setup** | Scaffold Nuxt 4 + Nuxt UI + Supabase module + PWA + Cloudflare Pages CI + oxlint |
-| **MVP** | Auth flows (register/login/verify/reset), records CRUD (direct Supabase + RLS), tags (predefined + custom), list with search/filter/sort |
-| **V2** | Review session (flashcards, self-grade, SRS via Nitro), session summary, stats dashboard (streak/counts) |
-| **V3** | SRS refinement, JSON export, random pick, advanced stats |
+| Phase     | Tech work                                                                                                                                |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Setup** | Scaffold Nuxt 4 + Nuxt UI + Supabase module + PWA + Cloudflare Pages CI + oxlint                                                         |
+| **MVP**   | Auth flows (register/login/verify/reset), records CRUD (direct Supabase + RLS), tags (predefined + custom), list with search/filter/sort |
+| **V2**    | Review session (flashcards, self-grade, SRS via Nitro), session summary, stats dashboard (streak/counts)                                 |
+| **V3**    | SRS refinement, JSON export, random pick, advanced stats                                                                                 |
 
 ---
 
 ## 14. Risks & Mitigations
 
-| Risk | Mitigation |
-|---|---|
-| Edge → Supabase latency | Supabase hosted in nearest region (Singapore/Japan for APAC users); keep record list queries indexed; consider Cloudflare Cache for read-only aggregates later |
-| Pages Functions cold start | Pre-warm via periodic request; most reads are direct client→Supabase so Nitro load is low |
-| Email deliverability (verification/reset) | Configure custom SMTP sender (Resend) when signups grow |
-| PWA offline vs online data | MVP = app shell offline + live data online; offline capture queue is a documented follow-up |
-| Supabase free tier limits | Row counts/MAU fit MVP; monitor usage dashboard; upgrade plan when needed |
+| Risk                                      | Mitigation                                                                                                                                                     |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Edge → Supabase latency                   | Supabase hosted in nearest region (Singapore/Japan for APAC users); keep record list queries indexed; consider Cloudflare Cache for read-only aggregates later |
+| Pages Functions cold start                | Pre-warm via periodic request; most reads are direct client→Supabase so Nitro load is low                                                                      |
+| Email deliverability (verification/reset) | Configure custom SMTP sender (Resend) when signups grow                                                                                                        |
+| PWA offline vs online data                | MVP = app shell offline + live data online; offline capture queue is a documented follow-up                                                                    |
+| Supabase free tier limits                 | Row counts/MAU fit MVP; monitor usage dashboard; upgrade plan when needed                                                                                      |
 
 ---
 

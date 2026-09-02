@@ -13,16 +13,16 @@ Guidance for AI agents and contributors working in this repository.
 
 ## Tech Stack
 
-| Area | Choice |
-|---|---|
+| Area      | Choice                                                    |
+| --------- | --------------------------------------------------------- |
 | Framework | Nuxt 4 (Vue 3 + Nitro server engine) — fullstack, one app |
-| Language | TypeScript (strict) |
-| Toolchain | pnpm · Vite (Rolldown option) · oxlint · Prettier |
-| DB + Auth | Supabase Cloud (Postgres + RLS + Supabase Auth) |
-| UI | Nuxt UI (Tailwind-based components) |
-| PWA | `@vite-pwa/nuxt` |
-| Deploy | Cloudflare Pages (nitro preset `cloudflare_pages`) |
-| Tests | Vitest (unit/component) · Playwright (e2e) |
+| Language  | TypeScript (strict)                                       |
+| Toolchain | pnpm · Vite (Rolldown option) · oxlint · Prettier         |
+| DB + Auth | Supabase Cloud (Postgres + RLS + Supabase Auth)           |
+| UI        | Nuxt UI (Tailwind-based components)                       |
+| PWA       | `@vite-pwa/nuxt`                                          |
+| Deploy    | Cloudflare Pages (nitro preset `cloudflare_pages`)        |
+| Tests     | Vitest (unit/component) · Playwright (e2e)                |
 
 ## Commands
 

@@ -27,20 +27,22 @@ Following product & architecture specifications, development is structured into 
 ### Phase 0: Foundation & Toolchain Setup
 
 #### 0.1 Toolchain & Config
-- [ ] Configure `nuxt.config.ts`:
+
+- [x] Configure `nuxt.config.ts`:
   - Register `@nuxt/ui`, `@nuxtjs/supabase`, `@vite-pwa/nuxt`.
   - Configure Nitro preset for Cloudflare Pages: `nitro: { preset: 'cloudflare_pages' }`.
   - Setup runtime config for Supabase public keys & session secrets.
-- [ ] Setup VoidZero toolchain & testing:
+- [x] Setup VoidZero toolchain & testing:
   - Add `oxlint` configuration and lint scripts (`pnpm lint`).
   - Add `prettier` configuration and format scripts (`pnpm format`).
   - Add `vitest` and `@vue/test-utils` for unit and component testing (`pnpm test`).
   - Set up pre-commit checking (`lint-staged`).
-- [ ] PWA & Asset shell:
+- [x] PWA & Asset shell:
   - Configure PWA manifest in `nuxt.config.ts` (icons, theme color, display standalone).
   - Add icon placeholders in `public/icons/` (192px, 512px, maskable) and `public/favicon.ico`.
 
 #### 0.2 Database & RLS Schema (Supabase)
+
 - [ ] Create initial SQL migration (`supabase/migrations/001_initial_schema.sql`):
   - Enums: `record_type ('word', 'phrase', 'sentence')`, `learning_status ('new', 'learning', 'mastered')`, `grade ('forgot', 'hazy', 'know', 'easy')`.
   - Tables: `records`, `tags`, `record_tags`, `review_states`, `review_events`.
@@ -57,6 +59,7 @@ Following product & architecture specifications, development is structured into 
   - Add standard tags: `work`, `daily`, `idiom`, `travel`.
 
 #### 0.3 Types & Shared Schemas
+
 - [ ] Create `app/types/database.ts` (generate or declare Supabase DB types).
 - [ ] Create `app/types/records.ts` with Zod validation schemas for:
   - `RecordInputSchema` (content, type, meaning, source, notes, tagIds).
@@ -68,6 +71,7 @@ Following product & architecture specifications, development is structured into 
 ### Phase 1: MVP (Capture, Organize & Auth)
 
 #### 1.1 Authentication & Shell
+
 - [ ] Implement global auth guard `app/middleware/auth.global.ts`:
   - Allow access to public routes: `/login`, `/register`, `/reset-password`, `/verify-email`.
   - Redirect unauthenticated users to `/login`.
@@ -81,6 +85,7 @@ Following product & architecture specifications, development is structured into 
   - `app/components/AppBottomNav.vue`: Navigation tabs (Records, Review, Quick Add (+), Stats, Me) visible on mobile.
 
 #### 1.2 Tag Management Composable & Components
+
 - [ ] Composable `app/composables/useTags.ts`:
   - Fetch predefined tags and user's custom tags.
   - Create custom tag, delete custom tag.
@@ -91,6 +96,7 @@ Following product & architecture specifications, development is structured into 
   - List predefined tags (read-only) and custom tags (with delete option).
 
 #### 1.3 Record Capture & Editing (CRUD)
+
 - [ ] Composable `app/composables/useRecords.ts`:
   - Direct PostgREST query client using user auth token.
   - Fetch records (paginated, sorted, filtered by type & tags, text search on content & meaning).
@@ -106,6 +112,7 @@ Following product & architecture specifications, development is structured into 
   - `app/pages/records/[id].vue`: Record detail view with edit/delete actions.
 
 #### 1.4 Record List & Search / Filter UX
+
 - [ ] Component `app/components/RecordCard.vue`:
   - Displays content, type badge, meaning, tags, and relative time (`2d ago`).
   - Mobile tap target linking to `/records/[id]`.
@@ -118,6 +125,7 @@ Following product & architecture specifications, development is structured into 
   - Infinite scroll / pagination loading indicator.
 
 #### 1.5 Me / Settings (Basic)
+
 - [ ] Page `app/pages/settings.vue`:
   - Display current user profile/email and membership date.
   - Links to Tag management.
@@ -128,6 +136,7 @@ Following product & architecture specifications, development is structured into 
 ### Phase 2: V2 (Structured Memorization & Habits)
 
 #### 2.1 SRS Interval Math & Server Routes
+
 - [ ] Server utility `server/utils/srs.ts`:
   - Pure function `calculateNextReview(currentInterval, consecutivePass, grade)`:
     - `forgot` -> interval resets to 1, status stays `learning`.
@@ -148,6 +157,7 @@ Following product & architecture specifications, development is structured into 
   - Execute transaction: update `review_states` and append to `review_events`.
 
 #### 2.2 Review UI & Session Flow
+
 - [ ] Composable `app/composables/useReview.ts`:
   - State management for active review queue, current index, session grades, and API synchronization.
 - [ ] Component `app/components/Flashcard.vue`:
@@ -169,6 +179,7 @@ Following product & architecture specifications, development is structured into 
       - "Done" (back to queue) and "Review Again" actions.
 
 #### 2.3 Stats & Progress Tracking
+
 - [ ] Nitro API route `server/api/stats.get.ts`:
   - Aggregations: Total records count, learning count, mastered count.
   - Streak calculation: consecutive distinct active review dates ending today/yesterday.
@@ -184,17 +195,20 @@ Following product & architecture specifications, development is structured into 
 ### Phase 3: V3 (Refinement, Portability & Advanced Features)
 
 #### 3.1 Data Portability (JSON Export)
+
 - [ ] Page `app/pages/settings/export.vue` (or modal in `settings.vue`):
   - Fetches all user records with their associated tags and review histories.
   - Formats as JSON payload.
   - Browser trigger to download `voc-export-[date].json`.
 
 #### 3.2 Algorithm & Queue Refinements
+
 - [ ] Support custom session sizes (e.g. 5, 10, 20 items per session).
 - [ ] Filter review sessions by tag or record type (e.g., "Review only Idioms").
 - [ ] "Random Pick / Word of the Day" widget on the Home page.
 
 #### 3.3 PWA Offline Resilience & Deployment Optimization
+
 - [ ] Service worker offline caching polish:
   - App shell precaching.
   - UI banner displaying offline status when disconnected.
@@ -207,20 +221,21 @@ Following product & architecture specifications, development is structured into 
 
 ## 3. Milestones & Delivery Schedule
 
-| Milestone | Target Deliverables | Acceptance Criteria |
-|---|---|---|
-| **M0: Project Bootstrap** | Nuxt 4 + Nuxt UI + Supabase DB + CI | `pnpm dev`, `pnpm lint`, `pnpm test` all pass. Schema migrated. |
-| **M1: Auth & Capture** | Email auth, RecordForm, Detail view | Users can sign up, confirm email, login, and add/edit words/phrases/sentences. |
-| **M2: Library & Search** | List view, multi-tag filter, keyword search | Instant filtering, responsive mobile UI, tags assigned and filtered cleanly. |
-| **M3: Review Engine (V2)** | `srs.ts`, `/api/review/*`, Flashcard UI | Self-grading updates interval and schedules next review accurately. |
-| **M4: Stats & Habits (V2)** | Stats page, streak counter, session summary | Streak increments properly, review sessions complete with breakdown. |
-| **M5: V3 Release** | JSON Export, PWA install, edge deployment | End-to-end user loop tested and deployed to Cloudflare Pages. |
+| Milestone                   | Target Deliverables                         | Acceptance Criteria                                                            |
+| --------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------ |
+| **M0: Project Bootstrap**   | Nuxt 4 + Nuxt UI + Supabase DB + CI         | `pnpm dev`, `pnpm lint`, `pnpm test` all pass. Schema migrated.                |
+| **M1: Auth & Capture**      | Email auth, RecordForm, Detail view         | Users can sign up, confirm email, login, and add/edit words/phrases/sentences. |
+| **M2: Library & Search**    | List view, multi-tag filter, keyword search | Instant filtering, responsive mobile UI, tags assigned and filtered cleanly.   |
+| **M3: Review Engine (V2)**  | `srs.ts`, `/api/review/*`, Flashcard UI     | Self-grading updates interval and schedules next review accurately.            |
+| **M4: Stats & Habits (V2)** | Stats page, streak counter, session summary | Streak increments properly, review sessions complete with breakdown.           |
+| **M5: V3 Release**          | JSON Export, PWA install, edge deployment   | End-to-end user loop tested and deployed to Cloudflare Pages.                  |
 
 ---
 
 ## 4. Verification & Testing Plan
 
 ### Automated Testing
+
 - **Unit tests (`vitest`)**:
   - `tests/unit/srs.test.ts`: Verify all grade transitions (`forgot`, `hazy`, `know`, `easy`) and interval limits.
   - `tests/unit/schemas.test.ts`: Validate Zod schemas against valid/invalid payloads.
@@ -233,6 +248,7 @@ Following product & architecture specifications, development is structured into 
   - `tests/e2e/review.spec.ts`: Queue item due -> review card -> check stats update.
 
 ### Manual / Quality Verification
+
 - **Cross-device testing**: Verify touch responsiveness on mobile viewports (375px–420px) and PC browser screens.
 - **RLS verification**: Confirm through Supabase client tests that User A cannot read or write User B's records or custom tags.
 - **Offline test**: Test PWA shell loading with network throttling / offline mode enabled in browser DevTools.
