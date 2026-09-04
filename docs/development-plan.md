@@ -43,19 +43,19 @@ Following product & architecture specifications, development is structured into 
 
 #### 0.2 Database & RLS Schema (Supabase)
 
-- [ ] Create initial SQL migration (`supabase/migrations/001_initial_schema.sql`):
+- [x] Create initial SQL migration (`supabase/migrations/001_initial_schema.sql`):
   - Enums: `record_type ('word', 'phrase', 'sentence')`, `learning_status ('new', 'learning', 'mastered')`, `grade ('forgot', 'hazy', 'know', 'easy')`.
   - Tables: `records`, `tags`, `record_tags`, `review_states`, `review_events`.
   - Indexes:
     - `idx_records_user_created` on `records(user_id, created_at desc)`
     - `idx_review_due` on `review_states(next_review_at) where status <> 'mastered'`
     - `idx_events_user_date` on `review_events(user_id, reviewed_at)`
-- [ ] Apply Row Level Security (RLS) policies:
+- [x] Apply Row Level Security (RLS) policies:
   - `records`: user owns records (`auth.uid() = user_id`).
   - `tags`: predefined tags readable by all (`is_predefined = true`), custom tags owned by creator (`auth.uid() = user_id`).
   - `record_tags`: scoped to owned records.
   - `review_states` & `review_events`: user-owned records and event rows only.
-- [ ] Seed script for predefined tags:
+- [x] Seed script for predefined tags:
   - Add standard tags: `work`, `daily`, `idiom`, `travel`.
 
 #### 0.3 Types & Shared Schemas
