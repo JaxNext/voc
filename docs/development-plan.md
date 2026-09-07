@@ -72,15 +72,15 @@ Following product & architecture specifications, development is structured into 
 
 #### 1.1 Authentication & Shell
 
-- [ ] Implement global auth guard `app/middleware/auth.global.ts`:
+- [x] Implement global auth guard `app/middleware/auth.global.ts`:
   - Allow access to public routes: `/login`, `/register`, `/reset-password`, `/verify-email`.
   - Redirect unauthenticated users to `/login`.
-- [ ] Create Auth Pages:
+- [x] Create Auth Pages:
   - `app/pages/login.vue`: Email & password sign-in form with validation, link to register and password reset.
   - `app/pages/register.vue`: Sign-up form with password criteria, redirect to verify-email.
   - `app/pages/verify-email.vue`: Instruction notice + verification callback handler.
   - `app/pages/reset-password.vue`: Password recovery request & token-based password update form.
-- [ ] Build Main App Shell:
+- [x] Build Main App Shell:
   - `app/app.vue`: Toast provider, layout container, mobile-first responsive wrapper.
   - `app/components/AppBottomNav.vue`: Navigation tabs (Records, Review, Quick Add (+), Stats, Me) visible on mobile.
 
