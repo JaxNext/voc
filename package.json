@@ -45,6 +45,7 @@
     "oxlint": "^1.80.0",
     "prettier": "^3.9.6",
     "simple-git-hooks": "^2.14.0",
+    "supabase": "^2.116.0",
     "vitest": "^4.1.11"
   }
 }
