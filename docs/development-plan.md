@@ -60,8 +60,8 @@ Following product & architecture specifications, development is structured into 
 
 #### 0.3 Types & Shared Schemas
 
-- [ ] Create `app/types/database.ts` (generate or declare Supabase DB types).
-- [ ] Create `app/types/records.ts` with Zod validation schemas for:
+- [x] Create `app/types/database.ts` (generate or declare Supabase DB types).
+- [x] Create `app/types/records.ts` with Zod validation schemas for:
   - `RecordInputSchema` (content, type, meaning, source, notes, tagIds).
   - `TagInputSchema`.
   - `ReviewGradeSchema`.

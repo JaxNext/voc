@@ -13,6 +13,11 @@ export default defineNuxtConfig({
   },
 
   supabase: {
+    // Point the module at our hand-written Database type. When a live
+    // Supabase project is connected this can be regenerated via
+    // `supabase gen types typescript --project-id <id>` and the file
+    // can simply be overwritten — the shape is a drop-in replacement.
+    types: '~/types/database',
     redirect: false, // We handle auth redirect in middleware
     cookieOptions: {
       secure: process.env.NODE_ENV === 'production',
