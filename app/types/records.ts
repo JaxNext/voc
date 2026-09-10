@@ -26,7 +26,8 @@ const MAX_CONTENT = 500
 const MAX_MEANING = 2000
 const MAX_SOURCE = 500
 const MAX_NOTES = 4000
-const MAX_TAG_NAME = 50
+// Exported: UI inputs (e.g. TagPicker) reuse it as the maxlength attribute.
+export const MAX_TAG_NAME = 50
 
 // ----- Tag ---------------------------------------------------------------
 

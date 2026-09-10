@@ -86,13 +86,13 @@ Following product & architecture specifications, development is structured into 
 
 #### 1.2 Tag Management Composable & Components
 
-- [ ] Composable `app/composables/useTags.ts`:
+- [x] Composable `app/composables/useTags.ts`:
   - Fetch predefined tags and user's custom tags.
   - Create custom tag, delete custom tag.
-- [ ] Component `app/components/TagPicker.vue`:
+- [x] Component `app/components/TagPicker.vue`:
   - Chip-based selector for record forms and filters.
   - Inline option to create a new custom tag.
-- [ ] Page `app/pages/tags.vue`:
+- [x] Page `app/pages/tags.vue`:
   - List predefined tags (read-only) and custom tags (with delete option).
 
 #### 1.3 Record Capture & Editing (CRUD)
