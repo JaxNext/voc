@@ -103,7 +103,7 @@ Following product & architecture specifications, development is structured into 
   - Create record (inserts into `records`, tags into `record_tags`, and initializes `review_states`).
   - Update record & tag associations.
   - Delete record (cascading deletes `record_tags` and `review_states`).
-- [ ] Component `app/components/RecordForm.vue`:
+- [x] Component `app/components/RecordForm.vue`:
   - Unified form for create and edit.
   - Fields: `type` (Word/Phrase/Sentence chips), `content`, `meaning`, `source`, `notes`, `TagPicker`.
   - Client-side validation via Zod.

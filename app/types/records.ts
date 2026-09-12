@@ -21,12 +21,12 @@ export const GradeSchema = z.enum(['forgot', 'hazy', 'know', 'easy'])
 export const REVIEW_GRADES = GradeSchema.enum
 
 // Soft limits — keep generous; Supabase text columns are unbounded but
-// real-world vocabulary entries are short.
-const MAX_CONTENT = 500
-const MAX_MEANING = 2000
-const MAX_SOURCE = 500
-const MAX_NOTES = 4000
-// Exported: UI inputs (e.g. TagPicker) reuse it as the maxlength attribute.
+// real-world vocabulary entries are short. Exported: UI inputs reuse them as
+// maxlength attributes (RecordForm) and TagPicker uses MAX_TAG_NAME.
+export const MAX_CONTENT = 500
+export const MAX_MEANING = 2000
+export const MAX_SOURCE = 500
+export const MAX_NOTES = 4000
 export const MAX_TAG_NAME = 50
 
 // ----- Tag ---------------------------------------------------------------
