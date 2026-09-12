@@ -113,10 +113,10 @@ Following product & architecture specifications, development is structured into 
 
 #### 1.4 Record List & Search / Filter UX
 
-- [ ] Component `app/components/RecordCard.vue`:
+- [x] Component `app/components/RecordCard.vue`:
   - Displays content, type badge, meaning, tags, and relative time (`2d ago`).
   - Mobile tap target linking to `/records/[id]`.
-- [ ] Page `app/pages/index.vue`:
+- [x] Page `app/pages/index.vue`:
   - Header with quick add action button.
   - Search input (debounced keyword search across `content` and `meaning`).
   - Filter bar: Type chips (`All`, `Word`, `Phrase`, `Sentence`), active tag filter row.
