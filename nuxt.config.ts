@@ -5,6 +5,19 @@ export default defineNuxtConfig({
 
   modules: ['@nuxt/ui', '@nuxtjs/supabase', '@vite-pwa/nuxt'],
 
+  // Tailwind v4 + Nuxt UI theme are loaded through this single CSS entry
+  // (the @nuxt/ui import injects its design tokens & component styles).
+  css: ['~/assets/css/main.css'],
+
+  // fonts.google.com is unreachable from some dev networks; skip the remote
+  // providers entirely so startup doesn't stall on retries (system fonts win).
+  fonts: {
+    providers: {
+      google: false,
+      googleicons: false,
+    },
+  },
+
   nitro: {
     preset: 'cloudflare_pages',
     cloudflare: {

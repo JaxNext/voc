@@ -25,7 +25,7 @@ function isActive(item: NavItem) {
 <template>
   <nav
     aria-label="Main navigation"
-    class="fixed inset-x-0 bottom-0 z-40 border-t border-default bg-default pb-[env(safe-area-inset-bottom)] md:hidden"
+    class="fixed inset-x-0 bottom-0 z-40 border-t border-default bg-default pb-[env(safe-area-inset-bottom)]"
   >
     <div class="mx-auto flex w-full max-w-lg">
       <NuxtLink
