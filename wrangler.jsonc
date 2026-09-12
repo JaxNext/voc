@@ -1,0 +1,19 @@
+{
+  "name": "voc",
+  "compatibility_date": "2026-09-12",
+  // Nitro's cloudflare_pages preset emits the static assets + _worker.js here.
+  "pages_build_output_dir": "dist",
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true
+    }
+  }
+}
