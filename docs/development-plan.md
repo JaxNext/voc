@@ -97,7 +97,7 @@ Following product & architecture specifications, development is structured into 
 
 #### 1.3 Record Capture & Editing (CRUD)
 
-- [ ] Composable `app/composables/useRecords.ts`:
+- [x] Composable `app/composables/useRecords.ts`:
   - Direct PostgREST query client using user auth token.
   - Fetch records (paginated, sorted, filtered by type & tags, text search on content & meaning).
   - Create record (inserts into `records`, tags into `record_tags`, and initializes `review_states`).

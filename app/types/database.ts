@@ -88,7 +88,25 @@ export type Database = {
           record_id?: string
           tag_id?: string
         }
-        Relationships: []
+        // FK constraint names follow Postgres's auto-naming for inline
+        // REFERENCES (record_tags_record_id_fkey / record_tags_tag_id_fkey).
+        // These let supabase-js resolve embeds like `record_tags(tags(*))`.
+        Relationships: [
+          {
+            foreignKeyName: 'record_tags_record_id_fkey'
+            columns: ['record_id']
+            isOneToOne: false
+            referencedRelation: 'records'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'record_tags_tag_id_fkey'
+            columns: ['tag_id']
+            isOneToOne: false
+            referencedRelation: 'tags'
+            referencedColumns: ['id']
+          },
+        ]
       }
       review_states: {
         Row: {
