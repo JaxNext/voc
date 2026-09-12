@@ -37,6 +37,21 @@ export default defineNuxtConfig({
     },
   },
 
+  // PWA installability: the @vite-pwa/nuxt module generates manifest.webmanifest
+  // and sw.js but does NOT inject the <link rel="manifest"> tag — the page head
+  // must reference the assets below or browsers won't offer installation.
+  app: {
+    head: {
+      link: [
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+        // Safari (macOS "Add to Dock", iOS home screen) picks the icon from
+        // this link, not from the manifest icons.
+        { rel: 'apple-touch-icon', href: '/icons/icon-192.png' },
+      ],
+      meta: [{ name: 'theme-color', content: '#0f172a' }],
+    },
+  },
+
   pwa: {
     manifest: {
       name: 'Voc — Vocabulary Review',
