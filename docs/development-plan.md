@@ -107,7 +107,7 @@ Following product & architecture specifications, development is structured into 
   - Unified form for create and edit.
   - Fields: `type` (Word/Phrase/Sentence chips), `content`, `meaning`, `source`, `notes`, `TagPicker`.
   - Client-side validation via Zod.
-- [ ] Pages:
+- [x] Pages:
   - `app/pages/records/new.vue`: New record entry page.
   - `app/pages/records/[id].vue`: Record detail view with edit/delete actions.
 
