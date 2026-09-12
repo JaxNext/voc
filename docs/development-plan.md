@@ -126,7 +126,7 @@ Following product & architecture specifications, development is structured into 
 
 #### 1.5 Me / Settings (Basic)
 
-- [ ] Page `app/pages/settings.vue`:
+- [x] Page `app/pages/settings.vue`:
   - Display current user profile/email and membership date.
   - Links to Tag management.
   - Logout action (clears cookie session and redirects to `/login`).
