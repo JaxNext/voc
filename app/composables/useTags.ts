@@ -91,7 +91,8 @@ export function useTags() {
 
     const { data, error } = await supabase
       .from('tags')
-      .insert({ name: parsed.data.name, user_id: user.value.id })
+      // user id comes from JWT claims (`sub`) since @nuxtjs/supabase v2.
+      .insert({ name: parsed.data.name, user_id: user.value.sub })
       .select()
       .single()
     if (error) throw new Error(describeError(error))

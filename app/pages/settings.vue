@@ -15,9 +15,17 @@ const toast = useToast()
 
 const signingOut = ref(false)
 
+// created_at only exists on the full User object; useSupabaseUser() holds JWT
+// claims since @nuxtjs/supabase v2, so read it from the session's user.
+const createdAt = ref('')
+onMounted(async () => {
+  const { data } = await supabase.auth.getSession()
+  createdAt.value = data.session?.user?.created_at ?? ''
+})
+
 const memberSince = computed(() =>
-  user.value?.created_at
-    ? new Date(user.value.created_at).toLocaleDateString(undefined, {
+  createdAt.value
+    ? new Date(createdAt.value).toLocaleDateString(undefined, {
         year: 'numeric',
         month: 'long',
       })

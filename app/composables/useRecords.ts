@@ -137,7 +137,9 @@ export function useRecords() {
     const { tagIds, ...fields } = parseInput(input)
     const { data: record, error } = await supabase
       .from('records')
-      .insert({ ...fields, user_id: user.value.id })
+      // useSupabaseUser() returns JWT claims in @nuxtjs/supabase v2 (getClaims()),
+      // so the user id lives in `sub`, not `id`.
+      .insert({ ...fields, user_id: user.value.sub })
       .select()
       .single()
     if (error) throw new Error(error.message)
