@@ -61,6 +61,7 @@ async function onSubmit({ data }: { data: RegisterInput }) {
               type="email"
               autocomplete="email"
               placeholder="you@example.com"
+              class="w-full"
             />
           </UFormField>
 
@@ -76,16 +77,18 @@ async function onSubmit({ data }: { data: RegisterInput }) {
               type="password"
               autocomplete="new-password"
               placeholder="Your password"
+              class="w-full"
             />
           </UFormField>
 
           <UFormField name="confirmPassword" label="Confirm password" required>
             <UInput
               v-model="state.confirmPassword"
-              name="confirmPassword"
+              name="password"
               type="password"
               autocomplete="new-password"
               placeholder="Repeat your password"
+              class="w-full"
             />
           </UFormField>
 

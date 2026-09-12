@@ -64,6 +64,7 @@ async function onSubmit({ data }: { data: LoginInput }) {
               type="email"
               autocomplete="email"
               placeholder="you@example.com"
+              class="w-full"
             />
           </UFormField>
 
@@ -74,6 +75,7 @@ async function onSubmit({ data }: { data: LoginInput }) {
               type="password"
               autocomplete="current-password"
               placeholder="Your password"
+              class="w-full"
             />
           </UFormField>
 

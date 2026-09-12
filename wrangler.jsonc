@@ -1,6 +1,0 @@
-{
-  "name": "voc",
-  "compatibility_date": "2026-09-12",
-  // Nitro's cloudflare_pages preset emits the static assets + _worker.js here.
-  "pages_build_output_dir": "dist"
-}

@@ -118,6 +118,7 @@ async function updatePassword({ data }: { data: NewPassword }) {
                 type="email"
                 autocomplete="email"
                 placeholder="you@example.com"
+                class="w-full"
               />
             </UFormField>
 
@@ -162,16 +163,18 @@ async function updatePassword({ data }: { data: NewPassword }) {
                 type="password"
                 autocomplete="new-password"
                 placeholder="Your new password"
+                class="w-full"
               />
             </UFormField>
 
             <UFormField name="confirmPassword" label="Confirm new password" required>
               <UInput
                 v-model="newPasswordState.confirmPassword"
-                name="confirmPassword"
+                name="password"
                 type="password"
                 autocomplete="new-password"
                 placeholder="Repeat your new password"
+                class="w-full"
               />
             </UFormField>
 
