@@ -165,7 +165,7 @@ Following product & architecture specifications, development is structured into 
   - Back view: recorded Content, plus source, notes, tags for context.
   - 4 one-tap grade buttons: `Forgot`, `Hazy`, `Know`, `Easy`.
   - Smooth card flip/slide transitions.
-- [ ] Pages:
+- [x] Pages:
   - `app/pages/review/index.vue`:
     - Today's review queue summary: "N items due today".
     - "Start Review Session" button.
