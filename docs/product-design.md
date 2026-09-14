@@ -86,7 +86,7 @@ Features:
 
 Features:
 
-- **Flashcard mode**: show the content, user recalls the meaning, tap to reveal
+- **Flashcard mode (production recall)**: front shows the meaning (and a type badge as disambiguation hint), user recalls the English expression they captured, tap to reveal the recorded content — trains active production (the app's core pain point), not just recognition. The recorded version is always shown on reveal so users still see the expression they saved.
 - **Self-grading**: mark as `Forgot` / `Hazy` / `Know` / `Easy`
 - **Learning status**: `New` → `Learning` → `Mastered`
 - **Spaced repetition (SRS) scheduling**: items are due for review based on grade, e.g. 1 / 3 / 7 / 14 days (simple intervals at first, can be refined later)
@@ -329,19 +329,19 @@ Edit mode = same form pre-filled with values; title becomes "Edit record".
 
 ### 6.5 Review — Flashcard
 
-**Front (recall)**
+**Front (recall — production direction)**
 
 ```text
 +-----------------------------+
 |  Review          3 / 10  ✕  |
 |  ┌───────────────────────┐  |
+|  │  PHRASE               │  |
 |  │                       │  |
-|  │   "I'm all ears"      │  |
-|  │                       │  |
+|  │   洗耳恭听              │  |
 |  │                       │  |
 |  └───────────────────────┘  |
 |                             |
-|      [ Show meaning ]       |
+|    [ Show expression ]      |
 |                             |
 |                             |
 +-----------------------------+
@@ -353,18 +353,21 @@ Edit mode = same form pre-filled with values; title becomes "Edit record".
 +-----------------------------+
 |  Review          3 / 10  ✕  |
 |  ┌───────────────────────┐  |
-|  │   "I'm all ears"      │  |
 |  │   洗耳恭听              │  |
+|  │   "I'm all ears"      │  |
 |  │   #idiom              │  |
+|  │   Podcast ep. 12      │  |
 |  └───────────────────────┘  |
 |                             |
-|  How well did you know it?  |
+|  Could you express it?      |
 |  [Forgot][Hazy][Know][Easy] |
 |                             |
 |  (4 buttons, 1 tap each)    |
 +-----------------------------+
 ```
 
+- Front shows the meaning + type badge (Word/Phrase/Sentence) as a disambiguation hint; user tries to produce the English expression they captured.
+- Reveal shows the recorded content (the version they actually saved), plus tags and source for context — so a _different but correct_ English expression still leads the user back to their original choice before self-grading.
 - Grade advances the card; next card slides in.
 - Session size configurable (default 10), see 6.6.
 

@@ -160,9 +160,9 @@ Following product & architecture specifications, development is structured into 
 
 - [x] Composable `app/composables/useReview.ts`:
   - State management for active review queue, current index, session grades, and API synchronization.
-- [ ] Component `app/components/Flashcard.vue`:
-  - Front view: Content, type indicator, "Show meaning" button.
-  - Back view: Meaning, source, notes, tags.
+- [x] Component `app/components/Flashcard.vue`:
+  - Front view (production recall): Meaning + type indicator, "Show expression" button.
+  - Back view: recorded Content, plus source, notes, tags for context.
   - 4 one-tap grade buttons: `Forgot`, `Hazy`, `Know`, `Easy`.
   - Smooth card flip/slide transitions.
 - [ ] Pages:
