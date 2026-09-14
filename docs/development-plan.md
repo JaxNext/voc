@@ -184,7 +184,7 @@ Following product & architecture specifications, development is structured into 
   - Aggregations: Total records count, learning count, mastered count.
   - Streak calculation: consecutive distinct active review dates ending today/yesterday.
   - Weekly review activity (counts per day for the last 7 days).
-- [ ] Page `app/pages/stats.vue`:
+- [x] Page `app/pages/stats.vue`:
   - Streak badge with flame icon (`🔥 5-day streak`).
   - KPI cards: Total, Learning, Mastered.
   - Due today callout with direct "Start review" CTA.

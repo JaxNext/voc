@@ -151,7 +151,8 @@ export function useReview() {
 
 // ofetch FetchError → user-presentable message. Nitro's createError payload
 // arrives in `data`; 401 means the cookie session expired mid-session.
-function describeError(error: unknown): string {
+// Exported for reuse by other API-consuming pages (e.g. the stats dashboard).
+export function describeError(error: unknown): string {
   if (typeof error === 'object' && error !== null) {
     const err = error as {
       data?: { message?: string; statusMessage?: string }
