@@ -158,7 +158,7 @@ Following product & architecture specifications, development is structured into 
 
 #### 2.2 Review UI & Session Flow
 
-- [ ] Composable `app/composables/useReview.ts`:
+- [x] Composable `app/composables/useReview.ts`:
   - State management for active review queue, current index, session grades, and API synchronization.
 - [ ] Component `app/components/Flashcard.vue`:
   - Front view: Content, type indicator, "Show meaning" button.
