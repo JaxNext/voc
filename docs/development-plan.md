@@ -180,7 +180,7 @@ Following product & architecture specifications, development is structured into 
 
 #### 2.3 Stats & Progress Tracking
 
-- [ ] Nitro API route `server/api/stats.get.ts`:
+- [x] Nitro API route `server/api/stats.get.ts`:
   - Aggregations: Total records count, learning count, mastered count.
   - Streak calculation: consecutive distinct active review dates ending today/yesterday.
   - Weekly review activity (counts per day for the last 7 days).
