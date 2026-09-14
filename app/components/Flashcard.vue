@@ -14,6 +14,7 @@
 // needed.
 
 import { ref, watch } from 'vue'
+import { useSpeech } from '~/composables/useSpeech'
 import type { Grade } from '~/types/records'
 import type { ReviewSessionItem } from '~/composables/useReview'
 
@@ -25,15 +26,19 @@ const props = defineProps<{
 
 const emit = defineEmits<{ grade: [grade: Grade] }>()
 
+const { supported: canSpeak, speaking, speak, stop } = useSpeech()
+
 const revealed = ref(false)
 
 // Cards always start face-down: when the parent swaps in the next item the
 // component instance is reused, so reset on record change (a failed grade
-// keeps the same record, leaving the card revealed for retry).
+// keeps the same record, leaving the card revealed for retry). Speech is
+// cancelled too so audio never bleeds into the next card.
 watch(
   () => props.item.record.id,
   () => {
     revealed.value = false
+    stop()
   },
 )
 
@@ -72,7 +77,20 @@ const GRADE_META: Array<{
 
       <!-- Back: reveal + self-grade -->
       <div class="flip-face flip-face-back rounded-2xl border border-default bg-elevated p-5">
-        <p class="text-xl font-medium break-words text-highlighted">"{{ item.record.content }}"</p>
+        <div class="flex items-start justify-between gap-2">
+          <p class="text-xl font-medium break-words text-highlighted">
+            "{{ item.record.content }}"
+          </p>
+          <UButton
+            v-if="canSpeak"
+            icon="i-lucide-volume-2"
+            :color="speaking ? 'primary' : 'neutral'"
+            variant="ghost"
+            size="xs"
+            aria-label="Play pronunciation"
+            @click="speak(item.record.content)"
+          />
+        </div>
         <p class="mt-1 text-sm text-muted">{{ item.record.meaning }}</p>
         <p
           v-if="item.record.tags.length > 0"

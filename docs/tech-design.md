@@ -94,7 +94,8 @@ voc/
 │   ├── composables/
 │   │   ├── useRecords.ts
 │   │   ├── useTags.ts
-│   │   └── useReview.ts
+│   │   ├── useReview.ts
+│   │   └── useSpeech.ts           # device TTS pronunciation (V3)
 │   ├── middleware/
 │   │   └── auth.global.ts          # redirect to /login when no session
 │   ├── server/
@@ -236,7 +237,7 @@ Email sending uses Supabase's built-in SMTP; a custom sender (Resend/SendGrid) c
 
 ---
 
-## 7. Business Logic: SRS & Stats (Nitro)
+## 7. Business Logic: SRS, Stats & Pronunciation
 
 ### SRS interval math — `server/utils/srs.ts` (pure, unit-testable)
 
@@ -269,6 +270,20 @@ function nextInterval(current: number, grade: Grade): number {
 - Total / learning / mastered counts (aggregate over `review_states`).
 - Streak: distinct `date(reviewed_at)` runs ending today/yesterday.
 - Weekly activity: counts of `review_events` grouped by day.
+
+### Pronunciation — Web Speech API (`app/composables/useSpeech.ts`, client-side, V3)
+
+No Nitro route and no third-party TTS service: pronunciation plays the record's `content` through the browser's built-in `speechSynthesis` (available in all modern desktop & mobile browsers) — in-app, works offline once the shell is cached.
+
+- `useSpeech()` wraps `window.speechSynthesis` and exposes `speak(text)`, `stop()`, a `supported` flag, and a reactive device voice list.
+- **User-selectable voice:** the Settings page gets a "Pronunciation voice" picker listing the device's `en-*` voices from `speechSynthesis.getVoices()` plus a Test preview button. The choice persists in `localStorage` (`voc:tts-voice`: voiceURI + lang) — voices are device-specific (Samantha on iOS, Google US English on Chrome…), so the preference is intentionally per-device rather than synced through Supabase.
+- **User-adjustable speed:** a "Speed" slider (0.5–2×, step 0.1) sits under the voice picker and persists per-device in `localStorage` (`voc:tts-rate`), applied as `utterance.rate` on every `speak()` — slower rates help learners parse connected speech.
+- **Voice resolution on speak:** saved voiceURI if still installed → first available `en-*` voice → `utterance.lang = 'en-US'` at normal rate.
+- **Async voice loading:** `getVoices()` can return an empty list before the engine is ready (notably Chrome); the composable listens for `voiceschanged` and refreshes reactively.
+- SSR-safe feature detection (`'speechSynthesis' in window`) — the UI hides the 🔊 button when unsupported.
+- Cancellation: `stop()` runs on unmount and before each new utterance, so audio never bleeds across flashcards or route changes.
+- Surfaces: record detail view (product-design §6.4), the flashcard back/reveal (product-design §6.5) — never the recall front, which must not leak hints — and the Settings voice picker (product-design §6.8).
+- Unit-tested with a stubbed `speechSynthesis`.
 
 ---
 
@@ -317,12 +332,12 @@ function nextInterval(current: number, grade: Grade): number {
 
 ## 12. Testing & Quality
 
-| Level     | Tool                    | Scope                               |
-| --------- | ----------------------- | ----------------------------------- |
-| Unit      | **Vitest**              | `srs.ts` interval math, Zod schemas |
-| Component | Vue Test Utils + Vitest | `RecordForm`, `Flashcard`           |
-| E2E       | **Playwright**          | login → add record → review flow    |
-| Lint      | **oxlint** + Prettier   | pre-commit hook (lint-staged)       |
+| Level     | Tool                    | Scope                                                                        |
+| --------- | ----------------------- | ---------------------------------------------------------------------------- |
+| Unit      | **Vitest**              | `srs.ts` interval math, Zod schemas, `useSpeech` (stubbed `speechSynthesis`) |
+| Component | Vue Test Utils + Vitest | `RecordForm`, `Flashcard`                                                    |
+| E2E       | **Playwright**          | login → add record → review flow                                             |
+| Lint      | **oxlint** + Prettier   | pre-commit hook (lint-staged)                                                |
 
 ---
 
@@ -333,7 +348,7 @@ function nextInterval(current: number, grade: Grade): number {
 | **Setup** | Scaffold Nuxt 4 + Nuxt UI + Supabase module + PWA + Cloudflare Pages CI + oxlint                                                         |
 | **MVP**   | Auth flows (register/login/verify/reset), records CRUD (direct Supabase + RLS), tags (predefined + custom), list with search/filter/sort |
 | **V2**    | Review session (flashcards, self-grade, SRS via Nitro), session summary, stats dashboard (streak/counts)                                 |
-| **V3**    | SRS refinement, JSON export, random pick, advanced stats                                                                                 |
+| **V3**    | SRS refinement, pronunciation (device TTS), JSON export, random pick, advanced stats                                                     |
 
 ---
 

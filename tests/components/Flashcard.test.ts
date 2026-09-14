@@ -4,14 +4,15 @@
 // check the `revealed` class on the flip container rather than computed
 // styles, which happy-dom does not evaluate.
 
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import Flashcard from '~/components/Flashcard.vue'
 import type { ReviewSessionItem } from '~/composables/useReview'
 
 const UButtonStub = {
-  template: '<button :disabled="disabled || loading" @click="$emit(\'click\')"><slot /></button>',
-  props: ['disabled', 'loading'],
+  template:
+    '<button :disabled="disabled || loading" :class="color" @click="$emit(\'click\')"><slot /></button>',
+  props: ['disabled', 'loading', 'color'],
   // Declared so the parent's onClick is NOT inherited as a native listener
   // (attrs fallthrough) in addition to the $emit path — that would double-fire.
   emits: ['click'],
@@ -46,6 +47,41 @@ function mountCard(item: ReviewSessionItem = makeItem('rec-1'), grading = false)
     global: { stubs: { UButton: UButtonStub } },
   })
 }
+
+// Installs a speechSynthesis stub on window (happy-dom has none natively) and
+// an utterance record holder so pronunciation wiring can be asserted.
+function stubSpeech() {
+  const speak = vi.fn<(utterance: FakeUtterance) => void>()
+  const cancel = vi.fn<() => void>()
+  const synth = {
+    getVoices: () => [],
+    speak,
+    cancel,
+    addEventListener: vi.fn<(type: string, listener: () => void) => void>(),
+    removeEventListener: vi.fn<(type: string, listener: () => void) => void>(),
+  }
+  class FakeUtterance {
+    text: string
+    lang = ''
+    voice: unknown = null
+    rate = 1
+    constructor(text: string) {
+      this.text = text
+    }
+  }
+  Object.defineProperty(window, 'speechSynthesis', {
+    value: synth,
+    configurable: true,
+    writable: true,
+  })
+  vi.stubGlobal('SpeechSynthesisUtterance', FakeUtterance)
+  return { speak, cancel }
+}
+
+afterEach(() => {
+  delete (window as unknown as Record<string, unknown>).speechSynthesis
+  vi.unstubAllGlobals()
+})
 
 describe('Flashcard', () => {
   it('starts face-down: front shows the meaning and type, not the expression', () => {
@@ -125,5 +161,52 @@ describe('Flashcard', () => {
 
     expect(wrapper.text()).not.toContain('Source:')
     expect(wrapper.text()).not.toContain('#idiom')
+  })
+
+  it('hides the pronunciation button when the device has no speech support', () => {
+    // happy-dom exposes no speechSynthesis, so `supported` stays false.
+    const wrapper = mountCard()
+
+    expect(wrapper.find('[aria-label="Play pronunciation"]').exists()).toBe(false)
+  })
+
+  it('speaks the record content from a button on the revealed back', async () => {
+    const { speak } = stubSpeech()
+    const wrapper = mountCard()
+    expect(speak).not.toHaveBeenCalled()
+
+    // Front stays silent — hearing audio there would leak a recall hint.
+    expect(wrapper.find('[aria-label="Play pronunciation"]').exists()).toBe(false)
+
+    await wrapper.find('button').trigger('click')
+    const playButton = wrapper.find('[aria-label="Play pronunciation"]')
+    expect(playButton.exists()).toBe(true)
+    await playButton.trigger('click')
+
+    expect(speak).toHaveBeenCalledTimes(1)
+    expect(speak.mock.calls[0]![0].text).toBe("I'm all ears")
+  })
+
+  it('cancels playback when the next card arrives', async () => {
+    const { cancel } = stubSpeech()
+    const wrapper = mountCard()
+    await wrapper.find('button').trigger('click')
+
+    await wrapper.setProps({ item: makeItem('rec-2') })
+
+    expect(cancel).toHaveBeenCalled()
+  })
+
+  it('highlights the pronunciation button while speech plays', async () => {
+    const { speak } = stubSpeech()
+    const wrapper = mountCard()
+    await wrapper.find('button').trigger('click')
+
+    const playButton = wrapper.find('[aria-label="Play pronunciation"]')
+    expect(playButton.classes()).toContain('neutral')
+
+    await playButton.trigger('click')
+    expect(speak).toHaveBeenCalledTimes(1)
+    expect(wrapper.find('[aria-label="Play pronunciation"]').classes()).toContain('primary')
   })
 })

@@ -1,19 +1,22 @@
 <script setup lang="ts">
 // "Me" page per product-design §6.8: profile card (email + member since),
-// Tags management link, and Log out. Export/Change password rows render as
-// disabled placeholders — export lands in 3.1, in-app password change is not
-// in the plan (the reset-password flow covers recovery). signOut() on the
-// @supabase/ssr-backed client clears the HttpOnly cookie session; the global
-// guard would catch the next navigation anyway, but we route to /login
-// explicitly per the plan.
+// Tags management link, the pronunciation voice picker (§3.3 — device TTS
+// voices, choice persisted per-device in localStorage via useSpeech), and
+// Log out. Export/Change password rows render as disabled placeholders —
+// export lands in 3.1, in-app password change is not in the plan (the
+// reset-password flow covers recovery). signOut() on the @supabase/ssr-backed
+// client clears the HttpOnly cookie session; the global guard would catch the
+// next navigation anyway, but we route to /login explicitly per the plan.
 
 useHead({ title: 'Me — Voc' })
 
 const user = useSupabaseUser()
 const supabase = useSupabaseClient()
 const toast = useToast()
+const { supported, englishVoices, savedVoice, selectVoice, rate, setRate, speak } = useSpeech()
 
 const signingOut = ref(false)
+const voiceOpen = ref(false)
 
 // created_at only exists on the full User object; useSupabaseUser() holds JWT
 // claims since @nuxtjs/supabase v2, so read it from the session's user.
@@ -31,6 +34,36 @@ const memberSince = computed(() =>
       })
     : '',
 )
+
+// Reka UI's Select forbids empty-string item values ("" means "clear to the
+// placeholder"), so Automatic uses a sentinel URI no real voice will carry.
+const AUTOMATIC = '__automatic__'
+
+// The select binds to the persisted choice: the sentinel means Automatic
+// (first English voice on the device), anything else resolves to the saved voice.
+const selectedUri = computed({
+  get: () => savedVoice.value?.uri ?? AUTOMATIC,
+  set: uri =>
+    selectVoice(
+      uri === AUTOMATIC ? null : (englishVoices.value.find(voice => voice.uri === uri) ?? null),
+    ),
+})
+
+const voiceItems = computed(() => [
+  { label: 'Automatic', value: AUTOMATIC },
+  ...englishVoices.value.map(voice => ({
+    label: `${voice.name} (${voice.lang})`,
+    value: voice.uri,
+  })),
+])
+
+const previewSentence = 'Hello! This is how Voc will pronounce your records.'
+
+// Slider binding for the playback speed (persists immediately via setRate).
+const rateValue = computed({
+  get: () => rate.value,
+  set: value => setRate(Number(value)),
+})
 
 async function logout() {
   if (signingOut.value) return
@@ -76,6 +109,45 @@ async function logout() {
       <div class="flex items-center justify-between px-4 py-3 text-sm text-dimmed">
         Data export (JSON)
         <span class="text-xs">Coming soon</span>
+      </div>
+      <div v-if="supported" class="flex flex-col">
+        <button
+          type="button"
+          class="flex w-full items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-accented/50"
+          :aria-expanded="voiceOpen"
+          @click="voiceOpen = !voiceOpen"
+        >
+          Pronunciation voice
+          <UIcon
+            name="i-lucide-chevron-right"
+            class="size-4 text-dimmed transition-transform"
+            :class="{ 'rotate-90': voiceOpen }"
+          />
+        </button>
+        <div v-if="voiceOpen" class="flex flex-col gap-3 px-4 pb-4">
+          <USelect v-model="selectedUri" :items="voiceItems" size="sm" />
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between text-xs text-muted">
+              <span>Speed</span>
+              <span class="tabular-nums">{{ rate.toFixed(1) }}×</span>
+            </div>
+            <USlider
+              v-model="rateValue"
+              :min="SPEECH_RATE_MIN"
+              :max="SPEECH_RATE_MAX"
+              :step="0.1"
+              aria-label="Playback speed"
+            />
+          </div>
+          <UButton
+            label="Test"
+            icon="i-lucide-volume-2"
+            size="xs"
+            variant="soft"
+            block
+            @click="speak(previewSentence)"
+          />
+        </div>
       </div>
       <div class="flex items-center justify-between px-4 py-3 text-sm text-dimmed">
         Change password

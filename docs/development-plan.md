@@ -18,7 +18,7 @@ Following product & architecture specifications, development is structured into 
 - **Phase 0: Foundation & Toolchain Setup** — Tooling, linting, tests, Supabase DB schema/migrations, basic project structure.
 - **Phase 1: MVP (Capture, Organize, Auth)** — Authentication with email verification & password reset, Direct Supabase PostgREST CRUD with RLS, Tagging system, Record list with search, filter, and sorting.
 - **Phase 2: V2 (Review & Habits)** — Nitro review session builder & grading API, pure SRS algorithm logic (`srs.ts`), Flashcard flow, session summary, and basic stats dashboard (streaks & counts).
-- **Phase 3: V3 (Refinement & Portability)** — Refined SRS algorithm, JSON export, Word-of-the-day / random pick, advanced statistics, PWA install prompt & offline shell polish.
+- **Phase 3: V3 (Refinement & Portability)** — Refined SRS algorithm, device-TTS pronunciation, JSON export, Word-of-the-day / random pick, advanced statistics, PWA install prompt & offline shell polish.
 
 ---
 
@@ -207,7 +207,24 @@ Following product & architecture specifications, development is structured into 
 - [ ] Filter review sessions by tag or record type (e.g., "Review only Idioms").
 - [ ] "Random Pick / Word of the Day" widget on the Home page.
 
-#### 3.3 PWA Offline Resilience & Deployment Optimization
+#### 3.3 Pronunciation (Device TTS)
+
+- [x] Composable `app/composables/useSpeech.ts`:
+  - Wrap `window.speechSynthesis`: `speak(content)`, `stop()`, and an SSR-safe `supported` flag.
+  - Reactive device voice list from `getVoices()` (refresh on `voiceschanged` — the first call can return empty).
+  - Voice resolution: user-saved voiceURI (localStorage `voc:tts-voice`) if still installed -> first `en-*` voice -> `lang: 'en-US'`; playback speed from localStorage `voc:tts-rate` (0.5-2x, default 1x) applied as `utterance.rate`.
+  - Cancel speech on unmount and before each new utterance (no audio bleed across flashcards).
+  - Unit tests against a stubbed `speechSynthesis` (`tests/unit/useSpeech.test.ts`).
+- [x] Settings voice picker (`app/pages/settings.vue`):
+  - "Pronunciation voice" row with a selector listing the device's `en-*` voices and a Test preview button.
+  - Speed slider (0.5-2x) next to the picker, applied live to Test and future playback.
+  - Persist both choices in localStorage — per-device by design (installed voices differ across devices).
+- [x] Wire the 🔊 button into surfaces:
+  - `app/pages/records/[id].vue`: play button on the detail view content card.
+  - `app/components/Flashcard.vue`: play button on the back/reveal view only — never the recall front.
+  - Hide the button when the browser does not support speech synthesis.
+
+#### 3.4 PWA Offline Resilience & Deployment Optimization
 
 - [ ] Service worker offline caching polish:
   - App shell precaching.
@@ -221,14 +238,14 @@ Following product & architecture specifications, development is structured into 
 
 ## 3. Milestones & Delivery Schedule
 
-| Milestone                   | Target Deliverables                         | Acceptance Criteria                                                            |
-| --------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------ |
-| **M0: Project Bootstrap**   | Nuxt 4 + Nuxt UI + Supabase DB + CI         | `pnpm dev`, `pnpm lint`, `pnpm test` all pass. Schema migrated.                |
-| **M1: Auth & Capture**      | Email auth, RecordForm, Detail view         | Users can sign up, confirm email, login, and add/edit words/phrases/sentences. |
-| **M2: Library & Search**    | List view, multi-tag filter, keyword search | Instant filtering, responsive mobile UI, tags assigned and filtered cleanly.   |
-| **M3: Review Engine (V2)**  | `srs.ts`, `/api/review/*`, Flashcard UI     | Self-grading updates interval and schedules next review accurately.            |
-| **M4: Stats & Habits (V2)** | Stats page, streak counter, session summary | Streak increments properly, review sessions complete with breakdown.           |
-| **M5: V3 Release**          | JSON Export, PWA install, edge deployment   | End-to-end user loop tested and deployed to Cloudflare Pages.                  |
+| Milestone                   | Target Deliverables                                            | Acceptance Criteria                                                            |
+| --------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| **M0: Project Bootstrap**   | Nuxt 4 + Nuxt UI + Supabase DB + CI                            | `pnpm dev`, `pnpm lint`, `pnpm test` all pass. Schema migrated.                |
+| **M1: Auth & Capture**      | Email auth, RecordForm, Detail view                            | Users can sign up, confirm email, login, and add/edit words/phrases/sentences. |
+| **M2: Library & Search**    | List view, multi-tag filter, keyword search                    | Instant filtering, responsive mobile UI, tags assigned and filtered cleanly.   |
+| **M3: Review Engine (V2)**  | `srs.ts`, `/api/review/*`, Flashcard UI                        | Self-grading updates interval and schedules next review accurately.            |
+| **M4: Stats & Habits (V2)** | Stats page, streak counter, session summary                    | Streak increments properly, review sessions complete with breakdown.           |
+| **M5: V3 Release**          | JSON Export, pronunciation (TTS), PWA install, edge deployment | End-to-end user loop tested and deployed to Cloudflare Pages.                  |
 
 ---
 
@@ -239,6 +256,7 @@ Following product & architecture specifications, development is structured into 
 - **Unit tests (`vitest`)**:
   - `tests/server/srs.test.ts`: Verify all grade transitions (`forgot`, `hazy`, `know`, `easy`) and interval limits.
   - `tests/unit/schemas.test.ts`: Validate Zod schemas against valid/invalid payloads.
+  - `tests/unit/useSpeech.test.ts`: Verify `speak`/`stop` wiring and English voice selection with a stubbed `speechSynthesis`.
 - **Component tests (`@vue/test-utils` + `vitest`)**:
   - `tests/components/RecordCard.test.ts`: Correct badge rendering and data binding.
   - `tests/components/Flashcard.test.ts`: Flip state and grade emissions.

@@ -19,6 +19,7 @@ const editing = ref(false)
 const confirmOpen = ref(false)
 const deleting = ref(false)
 const toast = useToast()
+const { supported, speaking, speak } = useSpeech()
 
 const isUuid = z.uuid().safeParse(String(route.params.id)).success
 
@@ -139,8 +140,17 @@ async function onDelete() {
     <template v-else-if="record">
       <UBadge :label="TYPE_LABELS[record.type]" color="neutral" variant="soft" class="w-fit" />
 
-      <section class="rounded-lg bg-elevated p-4">
+      <section class="flex items-start justify-between gap-3 rounded-lg bg-elevated p-4">
         <p class="text-lg font-medium break-words">"{{ record.content }}"</p>
+        <UButton
+          v-if="supported"
+          icon="i-lucide-volume-2"
+          :color="speaking ? 'primary' : 'neutral'"
+          variant="ghost"
+          size="xs"
+          aria-label="Play pronunciation"
+          @click="speak(record.content)"
+        />
       </section>
 
       <p class="text-base break-words">{{ record.meaning }}</p>

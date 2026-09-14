@@ -60,6 +60,7 @@ Features:
 
 - **Record list**: chronological (newest first), paginated or infinite scroll
 - **Detail view**: full record with all fields
+- **Pronunciation** _(V3)_: 🔊 button on the detail view plays the content aloud via the device's built-in text-to-speech — works for words, phrases, and full sentences
 - **Edit** any field
 - **Delete** (with confirmation)
 - **Bulk delete** _(later)_
@@ -87,6 +88,7 @@ Features:
 Features:
 
 - **Flashcard mode (production recall)**: front shows the meaning (and a type badge as disambiguation hint), user recalls the English expression they captured, tap to reveal the recorded content — trains active production (the app's core pain point), not just recognition. The recorded version is always shown on reveal so users still see the expression they saved.
+- **Pronunciation on reveal** _(V3)_: 🔊 button on the back view plays the recorded content aloud (device built-in TTS), so users can compare their own production with the correct pronunciation
 - **Self-grading**: mark as `Forgot` / `Hazy` / `Know` / `Easy`
 - **Learning status**: `New` → `Learning` → `Mastered`
 - **Spaced repetition (SRS) scheduling**: items are due for review based on grade, e.g. 1 / 3 / 7 / 14 days (simple intervals at first, can be refined later)
@@ -126,19 +128,20 @@ Features:
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | **MVP** | Auth (register/login/logout, email verification, password reset), record CRUD, record list, search & filter, predefined + custom tags |
 | **V2**  | Review mode (flashcards + self-grade + learning status), session-based review queue, basic stats (counts, streak)                     |
-| **V3**  | Spaced repetition refinement, JSON export, random pick, advanced stats                                                                |
+| **V3**  | Spaced repetition refinement, pronunciation (device TTS), JSON export, random pick, advanced stats                                    |
 
 ---
 
 ## 5. Key Decisions
 
-| Topic                               | Decision                                           |
-| ----------------------------------- | -------------------------------------------------- |
-| Password reset & email verification | In MVP                                             |
-| Tag UX                              | Predefined tags + custom tags                      |
-| Review session style                | Session-based (fixed number of items per session)  |
-| Data export                         | JSON only                                          |
-| SRS algorithm                       | Start simple (fixed intervals) in V2, refine in V3 |
+| Topic                               | Decision                                                                                                                                                                                                                                             |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Password reset & email verification | In MVP                                                                                                                                                                                                                                               |
+| Tag UX                              | Predefined tags + custom tags                                                                                                                                                                                                                        |
+| Review session style                | Session-based (fixed number of items per session)                                                                                                                                                                                                    |
+| Data export                         | JSON only                                                                                                                                                                                                                                            |
+| SRS algorithm                       | Start simple (fixed intervals) in V2, refine in V3                                                                                                                                                                                                   |
+| Pronunciation                       | Device built-in TTS (Web Speech API); 🔊 on detail view + flashcard reveal; user-selectable English voice and playback speed (0.5–2×) from the device (per-device preferences, Settings); no third-party TTS service; button hidden when unsupported |
 
 ---
 
@@ -312,7 +315,7 @@ Edit mode = same form pre-filled with values; title becomes "Edit record".
 |                             |
 |        SENTENCE             |
 |  ┌───────────────────────┐  |
-|  │   "I'm all ears"      │  |
+|  │   "I'm all ears"   🔊 │  |
 |  └───────────────────────┘  |
 |                             |
 |  洗耳恭听                    |
@@ -326,6 +329,8 @@ Edit mode = same form pre-filled with values; title becomes "Edit record".
 |  [      Delete record   ]   |
 +-----------------------------+
 ```
+
+- 🔊 = play pronunciation (device built-in TTS, English voice) — available for words, phrases, and sentences.
 
 ### 6.5 Review — Flashcard
 
@@ -354,7 +359,7 @@ Edit mode = same form pre-filled with values; title becomes "Edit record".
 |  Review          3 / 10  ✕  |
 |  ┌───────────────────────┐  |
 |  │   洗耳恭听              │  |
-|  │   "I'm all ears"      │  |
+|  │   "I'm all ears"   🔊 │  |
 |  │   #idiom              │  |
 |  │   Podcast ep. 12      │  |
 |  └───────────────────────┘  |
@@ -368,6 +373,7 @@ Edit mode = same form pre-filled with values; title becomes "Edit record".
 
 - Front shows the meaning + type badge (Word/Phrase/Sentence) as a disambiguation hint; user tries to produce the English expression they captured.
 - Reveal shows the recorded content (the version they actually saved), plus tags and source for context — so a _different but correct_ English expression still leads the user back to their original choice before self-grading.
+- 🔊 on the back plays the recorded content aloud (device TTS) so users can compare it with their own production.
 - Grade advances the card; next card slides in.
 - Session size configurable (default 10), see 6.6.
 
@@ -423,6 +429,7 @@ Edit mode = same form pre-filled with values; title becomes "Edit record".
 |                             |
 |  Tags management        >   |
 |  Data export (JSON)     >   |
+|  Pronunciation voice    >   |
 |  Change password        >   |
 |  About                   >  |
 |  [       Log out        ]   |
