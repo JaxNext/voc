@@ -30,6 +30,7 @@
   "dependencies": {
     "@nuxt/ui": "^4.11.0",
     "@nuxtjs/supabase": "^2.0.10",
+    "@supabase/supabase-js": "^2.112.4",
     "@vite-pwa/nuxt": "^1.1.1",
     "nuxt": "^4.5.2",
     "tailwindcss": "^4.3.3",

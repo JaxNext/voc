@@ -137,7 +137,7 @@ Following product & architecture specifications, development is structured into 
 
 #### 2.1 SRS Interval Math & Server Routes
 
-- [ ] Server utility `server/utils/srs.ts`:
+- [x] Server utility `server/utils/srs.ts`:
   - Pure function `calculateNextReview(currentInterval, consecutivePass, grade)`:
     - `forgot` -> interval resets to 1, status stays `learning`.
     - `hazy` -> interval halved (`Math.max(1, Math.round(current / 2))`).
@@ -145,13 +145,13 @@ Following product & architecture specifications, development is structured into 
     - `easy` -> accelerated jump (`Math.min(30, Math.round(current * 3))`).
     - 3 consecutive `know`/`easy` passes mark record as `mastered`.
   - Comprehensive unit test suite in `tests/server/srs.test.ts`.
-- [ ] Server utility `server/utils/supabase.ts`:
+- [x] Server utility `server/utils/supabase.ts`:
   - Service-role Supabase client helper for secure backend-only mutations.
-- [ ] Nitro API route `server/api/review/session.get.ts`:
+- [x] Nitro API route `server/api/review/session.get.ts`:
   - Verify caller session via auth token.
   - Fetch up to $N$ (default 10) due items (`next_review_at <= now()`, status not `mastered`).
   - Shuffle items to avoid memorization order bias.
-- [ ] Nitro API route `server/api/review/grade.post.ts`:
+- [x] Nitro API route `server/api/review/grade.post.ts`:
   - Validate body: `{ record_id: string, grade: 'forgot'|'hazy'|'know'|'easy' }`.
   - Compute new interval and status via `srs.ts`.
   - Execute transaction: update `review_states` and append to `review_events`.
@@ -237,7 +237,7 @@ Following product & architecture specifications, development is structured into 
 ### Automated Testing
 
 - **Unit tests (`vitest`)**:
-  - `tests/unit/srs.test.ts`: Verify all grade transitions (`forgot`, `hazy`, `know`, `easy`) and interval limits.
+  - `tests/server/srs.test.ts`: Verify all grade transitions (`forgot`, `hazy`, `know`, `easy`) and interval limits.
   - `tests/unit/schemas.test.ts`: Validate Zod schemas against valid/invalid payloads.
 - **Component tests (`@vue/test-utils` + `vitest`)**:
   - `tests/components/RecordCard.test.ts`: Correct badge rendering and data binding.
