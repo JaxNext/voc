@@ -6,7 +6,7 @@ This document outlines the actionable, step-by-step engineering roadmap to imple
 
 ## 1. Overview & Phasing Strategy
 
-Following product & architecture specifications, development is structured into 4 sequential phases:
+Following product & architecture specifications, development is structured into 5 sequential phases:
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -19,6 +19,7 @@ Following product & architecture specifications, development is structured into 
 - **Phase 1: MVP (Capture, Organize, Auth)** — Authentication with email verification & password reset, Direct Supabase PostgREST CRUD with RLS, Tagging system, Record list with search, filter, and sorting.
 - **Phase 2: V2 (Review & Habits)** — Nitro review session builder & grading API, pure SRS algorithm logic (`srs.ts`), Flashcard flow, session summary, and basic stats dashboard (streaks & counts).
 - **Phase 3: V3 (Refinement & Portability)** — Refined SRS algorithm, device-TTS pronunciation, JSON export, Word-of-the-day / random pick, advanced statistics, PWA install prompt & offline shell polish.
+- **Phase 4: OAuth Provider** — Voc as an OAuth 2.1 provider on Supabase's native OAuth Server (beta): consent UI, auth-flow plumbing, manual client registration, user-scoped read-write third-party access under existing RLS.
 
 ---
 
@@ -233,6 +234,50 @@ Following product & architecture specifications, development is structured into 
   - Capture `beforeinstallprompt` event and trigger native install prompt.
 - [ ] Cloudflare Pages build validation:
   - Verify edge bundle size and cold start performance.
+
+---
+
+### Phase 4: OAuth Provider (Third-party Data Access)
+
+> Design & locked decisions: [oauth-provider-tech-design.md](./oauth-provider-tech-design.md).
+> Voc acts as an OAuth 2.1 **provider** via Supabase's native OAuth Server (beta): third-party
+> apps sign users in with their Voc account and get user-scoped **read-write** PostgREST access,
+> governed by the existing RLS policies. Supabase owns the protocol machinery (authorize /
+> token / JWKS); Voc implements only the consent UI and auth-flow plumbing.
+
+#### 4.1 Prerequisites & SDK Verification
+
+- [x] Verify `@supabase/supabase-js` exposes `supabase.auth.oauth.*` (`getAuthorizationDetails` / `approveAuthorization` / `denyAuthorization`) — the pinned `^2.112.4` predates it; upgrade supabase-js (check `@nuxtjs/supabase` compatibility) or fall back to direct GoTrue HTTP calls in the consent page. → Resolved: upgraded to `^2.116.0`; namespace confirmed (see docs/4.1-oauth-sdk-verification.md).
+- [x] Confirm production Site URL `https://voc-9d5.pages.dev` (Dashboard → Authentication → URL Configuration). → Confirmed: domain live. Sequencing (user decision): keep `http://localhost:3000` as Site URL through local dev/consent testing (4.2–4.5), switch to the production origin + `http://localhost:3000/**` Redirect-URL allowlist as the final 4.5 step.
+
+#### 4.2 Supabase Project Configuration (dashboard, manual)
+
+- [x] Migrate JWT signing keys to RS256/ES256 (Dashboard → **Settings → JWT** signing keys — not under Authentication) — recommended so third parties validate tokens via JWKS. Zero downtime: _Migrate JWT secret_ → _Rotate keys_ → wait ~1h15m → optionally revoke legacy secret; rotation does **not** force sign-out (design §6). → Done: ES256 (EC P-256) confirmed live via JWKS.
+- [x] Enable OAuth 2.1 Server (Authentication → OAuth Server) and set Authorization Path to `/oauth/consent`; keep dynamic client registration disabled (manual registration only). → Done: discovery endpoint serving authorize/token metadata (see docs/4.2-oauth-server-config.md).
+- [x] Register the first test OAuth client: type `public` (`token_endpoint_auth_method: none`), exact redirect URI (e.g. `http://localhost:<port>/callback`), record the `client_id`. → Done: `client_id 9b5a1ba3-4b09-4e45-9e92-279bfd401555` (public client).
+
+#### 4.3 Consent Route & Auth-flow Plumbing
+
+- [ ] `app/utils/routes.ts`: export an `OAUTH_CONSENT_PATH = '/oauth/consent'` constant — deliberately **not** added to `PUBLIC_AUTH_PATHS` (the page requires a session).
+- [ ] `app/middleware/auth.global.ts`: when an unauthenticated user hits the consent path, redirect to `/login?redirect=/oauth/consent?authorization_id=…` so the flow survives the bounce (design §7.1).
+- [ ] `app/pages/login.vue`: after login, honor a same-origin `redirect` query param (strict open-redirect guard — internal paths only), otherwise default `/`.
+- [ ] `app/pages/register.vue`: same preserve-and-return handling as login.
+- [ ] `app/app.vue`: hide the bottom nav on the consent route (extend the mechanism that hides it on `PUBLIC_AUTH_PATHS`).
+
+#### 4.4 Consent Page `app/pages/oauth/consent.vue`
+
+- [ ] Read `authorization_id` from the route query; render an error state when missing/invalid.
+- [ ] Fetch `getAuthorizationDetails(authorization_id)`; render client name, redirect URI, and requested scopes (single space-separated string). If the response carries `redirect_url` without `authorization_id` (user already consented), redirect the browser there immediately.
+- [ ] Approve / Deny call `approveAuthorization` / `denyAuthorization`, then follow the returned `redirect_url` (`navigateTo(..., { external: true })`); surface API errors in the error state.
+- [ ] Unit/component tests (stub `supabase.auth.oauth`): renders client name + scopes; approve/deny invoke the correct method; missing-`authorization_id` error state.
+
+#### 4.5 End-to-End Verification
+
+- [ ] Manual happy path: authorization-code + PKCE flow (curl or scratch page) → sign in with a Voc account → approve consent → exchange code at `/auth/v1/oauth/token` → read and then write the user's `records` via PostgREST with the access token.
+- [ ] RLS isolation: a token for user A cannot read or write user B's rows.
+- [ ] Consent edge cases: missing `authorization_id`; already-consented `redirect_url` shortcut; deny returns an OAuth error to the client's redirect URI; unauthenticated bounce preserves `authorization_id` through login.
+- [ ] Finalize Site URL: switch Authentication → URL Configuration → Site URL from `http://localhost:3000` to `https://voc-9d5.pages.dev` (no trailing slash), add `http://localhost:3000/**` (+ other dev ports) to Redirect URLs, then smoke-test consent entry on the production origin.
+- [ ] `pnpm lint`, `pnpm test`, `pnpm build` all pass; implementation record per convention (`docs/4.x-oauth-provider.md`, created when work starts).
 
 ---
 
