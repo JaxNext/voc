@@ -273,11 +273,11 @@ Following product & architecture specifications, development is structured into 
 
 #### 4.5 End-to-End Verification
 
-- [ ] Manual happy path: authorization-code + PKCE flow (curl or scratch page) → sign in with a Voc account → approve consent → exchange code at `/auth/v1/oauth/token` → read and then write the user's `records` via PostgREST with the access token.
-- [ ] RLS isolation: a token for user A cannot read or write user B's rows.
-- [ ] Consent edge cases: missing `authorization_id`; already-consented `redirect_url` shortcut; deny returns an OAuth error to the client's redirect URI; unauthenticated bounce preserves `authorization_id` through login.
-- [ ] Finalize Site URL: switch Authentication → URL Configuration → Site URL from `http://localhost:3000` to `https://voc-9d5.pages.dev` (no trailing slash), add `http://localhost:3000/**` (+ other dev ports) to Redirect URLs, then smoke-test consent entry on the production origin.
-- [ ] `pnpm lint`, `pnpm test`, `pnpm build` all pass; implementation record per convention (`docs/4.x-oauth-provider.md`, created when work starts).
+- [ ] Manual happy path: authorization-code + PKCE flow (curl or scratch page) → sign in with a Voc account → approve consent → exchange code at `/auth/v1/oauth/token` → read and then write the user's `records` via PostgREST with the access token. → **Ready**: mock client at [scripts/oauth-mock-client.mjs](file:///Users/jax/Dev/voc/scripts/oauth-mock-client.mjs) (`node scripts/oauth-mock-client.mjs` → http://localhost:5000/); authorize endpoint smoke-tested via curl (302 → production consent, PKCE accepted). Pending: interactive run (runbook in [4.5 record](file:///Users/jax/Dev/voc/docs/4.5-oauth-e2e-verification.md)).
+- [ ] RLS isolation: a token for user A cannot read or write user B's rows. → Runbook: run the mock flow as two different accounts and compare the read tables.
+- [ ] Consent edge cases: missing `authorization_id`; already-consented `redirect_url` shortcut; deny returns an OAuth error to the client's redirect URI; unauthenticated bounce preserves `authorization_id` through login. → Verified headlessly: bounce on production (curl 302 with `redirect=/oauth/consent?authorization_id=x`), stale redirect URI rejected (400), missing-id + already-consented covered by unit tests; deny path pending interactive run.
+- [ ] Finalize Site URL: switch Authentication → URL Configuration → Site URL from `http://localhost:3000` to `https://voc-9d5.pages.dev` (no trailing slash), add `http://localhost:3000/**` (+ other dev ports) to Redirect URLs, then smoke-test consent entry on the production origin. → Site URL is **already** `https://voc-9d5.pages.dev` (seen in the authorize 302) and production consent entry is smoke-tested (guard bounce verified); remaining: add `http://localhost:3000/**` to Redirect URLs.
+- [x] `pnpm lint`, `pnpm test`, `pnpm build` all pass; implementation record per convention (`docs/4.x-oauth-provider.md`, created when work starts). → Done: lint 0/0, 118/118 tests, tsc clean, build success; record at [4.5-oauth-e2e-verification.md](file:///Users/jax/Dev/voc/docs/4.5-oauth-e2e-verification.md).
 
 ---
 
