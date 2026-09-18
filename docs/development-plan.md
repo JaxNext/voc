@@ -266,10 +266,10 @@ Following product & architecture specifications, development is structured into 
 
 #### 4.4 Consent Page `app/pages/oauth/consent.vue`
 
-- [ ] Read `authorization_id` from the route query; render an error state when missing/invalid.
-- [ ] Fetch `getAuthorizationDetails(authorization_id)`; render client name, redirect URI, and requested scopes (single space-separated string). If the response carries `redirect_url` without `authorization_id` (user already consented), redirect the browser there immediately.
-- [ ] Approve / Deny call `approveAuthorization` / `denyAuthorization`, then follow the returned `redirect_url` (`navigateTo(..., { external: true })`); surface API errors in the error state.
-- [ ] Unit/component tests (stub `supabase.auth.oauth`): renders client name + scopes; approve/deny invoke the correct method; missing-`authorization_id` error state.
+- [x] Read `authorization_id` from the route query; render an error state when missing/invalid. → Done: [useOAuthConsent.ts](file:///Users/jax/Dev/voc/app/composables/useOAuthConsent.ts) `init()`; page renders a `UAlert` error state.
+- [x] Fetch `getAuthorizationDetails(authorization_id)`; render client name, redirect URI, and requested scopes (single space-separated string). If the response carries `redirect_url` without `authorization_id` (user already consented), redirect the browser there immediately. → Done: details/scope-list rendered; already-consented short-circuits via `navigateTo(redirect_url, { external: true })`.
+- [x] Approve / Deny call `approveAuthorization` / `denyAuthorization`, then follow the returned `redirect_url` (`navigateTo(..., { external: true })`); surface API errors in the error state. → Done: with `{ skipBrowserRedirect: true }`, explicit redirect follow, pending-state guard against double clicks.
+- [x] Unit/component tests (stub `supabase.auth.oauth`): renders client name + scopes; approve/deny invoke the correct method; missing-`authorization_id` error state. → Done: [useOAuthConsent.test.ts](file:///Users/jax/Dev/voc/tests/unit/useOAuthConsent.test.ts), 9 tests (118/118 total). Logic lives in the `useOAuthConsent` composable (project convention: thin pages, unit-tested composables).
 
 #### 4.5 End-to-End Verification
 
