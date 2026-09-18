@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { LoginInputSchema, type LoginInput } from '~/types/auth'
+import { sanitizeInternalRedirect } from '~/utils/routes'
 
 useHead({ title: 'Log in — Voc' })
 
@@ -12,6 +13,17 @@ const pending = ref(false)
 
 // Set when arriving from reset-password after a successful password update.
 const resetDone = computed(() => route.query.reset === '1')
+
+// Pending OAuth consent flow (or other internal deep link) carried through the
+// bounce. Strict same-origin guard; falls back to the default destination.
+const redirectTarget = computed(() => sanitizeInternalRedirect(route.query.redirect))
+
+// Preserve the pending flow when the user switches to registration instead.
+const registerTo = computed(() =>
+  redirectTarget.value
+    ? `/register?redirect=${encodeURIComponent(redirectTarget.value)}`
+    : '/register',
+)
 
 async function onSubmit({ data }: { data: LoginInput }) {
   serverError.value = null
@@ -29,7 +41,7 @@ async function onSubmit({ data }: { data: LoginInput }) {
       serverError.value = error.message
       return
     }
-    await navigateTo('/')
+    await navigateTo(redirectTarget.value ?? '/')
   } finally {
     pending.value = false
   }
@@ -96,7 +108,7 @@ async function onSubmit({ data }: { data: LoginInput }) {
         <p class="text-center text-sm text-gray-500 dark:text-gray-400">
           No account yet?
           <NuxtLink
-            to="/register"
+            :to="registerTo"
             class="font-medium text-gray-900 underline underline-offset-4 dark:text-gray-100"
           >
             Create one

@@ -1,25 +1,41 @@
 <script setup lang="ts">
 import { RegisterInputSchema, type RegisterInput } from '~/types/auth'
+import { sanitizeInternalRedirect } from '~/utils/routes'
 
 useHead({ title: 'Create account — Voc' })
 
+const route = useRoute()
 const supabase = useSupabaseClient()
 
 const state = reactive<RegisterInput>({ email: '', password: '', confirmPassword: '' })
 const serverError = ref<string | null>(null)
 const pending = ref(false)
 
+// Pending OAuth consent flow (or other internal deep link) carried through the
+// bounce from the consent route. Strict same-origin guard; falls back to '/'.
+const redirectTarget = computed(() => sanitizeInternalRedirect(route.query.redirect))
+
+// Preserve the pending flow when the user switches to login instead.
+const loginTo = computed(() =>
+  redirectTarget.value ? `/login?redirect=${encodeURIComponent(redirectTarget.value)}` : '/login',
+)
+
 async function onSubmit({ data }: { data: RegisterInput }) {
   serverError.value = null
   pending.value = true
   try {
+    // Verify-email callback URL; a pending redirect rides along so the OAuth
+    // consent flow also survives the email-verification detour.
+    const verifyEmailUrl = `${window.location.origin}/verify-email${
+      redirectTarget.value ? `?redirect=${encodeURIComponent(redirectTarget.value)}` : ''
+    }`
     const { data: result, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
         // Point the confirmation email back at our verify page so the
         // callback (token_hash / access_token) lands where we handle it.
-        emailRedirectTo: `${window.location.origin}/verify-email`,
+        emailRedirectTo: verifyEmailUrl,
       },
     })
     if (error) {
@@ -29,11 +45,15 @@ async function onSubmit({ data }: { data: RegisterInput }) {
     if (result.session) {
       // Email confirmation is disabled on the project (or auto-confirmed):
       // the user is already signed in.
-      await navigateTo('/')
+      await navigateTo(redirectTarget.value ?? '/')
       return
     }
     // Confirmation required — show the "check your inbox" notice.
-    await navigateTo(`/verify-email?email=${encodeURIComponent(data.email)}`)
+    await navigateTo(
+      `/verify-email?email=${encodeURIComponent(data.email)}${
+        redirectTarget.value ? `&redirect=${encodeURIComponent(redirectTarget.value)}` : ''
+      }`,
+    )
   } finally {
     pending.value = false
   }
@@ -100,7 +120,7 @@ async function onSubmit({ data }: { data: RegisterInput }) {
         <p class="text-center text-sm text-gray-500 dark:text-gray-400">
           Already have an account?
           <NuxtLink
-            to="/login"
+            :to="loginTo"
             class="font-medium text-gray-900 underline underline-offset-4 dark:text-gray-100"
           >
             Log in

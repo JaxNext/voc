@@ -258,11 +258,11 @@ Following product & architecture specifications, development is structured into 
 
 #### 4.3 Consent Route & Auth-flow Plumbing
 
-- [ ] `app/utils/routes.ts`: export an `OAUTH_CONSENT_PATH = '/oauth/consent'` constant — deliberately **not** added to `PUBLIC_AUTH_PATHS` (the page requires a session).
-- [ ] `app/middleware/auth.global.ts`: when an unauthenticated user hits the consent path, redirect to `/login?redirect=/oauth/consent?authorization_id=…` so the flow survives the bounce (design §7.1).
-- [ ] `app/pages/login.vue`: after login, honor a same-origin `redirect` query param (strict open-redirect guard — internal paths only), otherwise default `/`.
-- [ ] `app/pages/register.vue`: same preserve-and-return handling as login.
-- [ ] `app/app.vue`: hide the bottom nav on the consent route (extend the mechanism that hides it on `PUBLIC_AUTH_PATHS`).
+- [x] `app/utils/routes.ts`: export an `OAUTH_CONSENT_PATH = '/oauth/consent'` constant — deliberately **not** added to `PUBLIC_AUTH_PATHS` (the page requires a session). → Done: [routes.ts](file:///Users/jax/Dev/voc/app/utils/routes.ts); lint + 105/105 tests pass.
+- [x] `app/middleware/auth.global.ts`: when an unauthenticated user hits the consent path, redirect to `/login?redirect=/oauth/consent?authorization_id=…` so the flow survives the bounce (design §7.1). → Done: uses `to.fullPath` encoded as the `redirect` param; other protected routes keep the plain `/login` bounce.
+- [x] `app/pages/login.vue`: after login, honor a same-origin `redirect` query param (strict open-redirect guard — internal paths only), otherwise default `/`. → Done: `sanitizeInternalRedirect` helper in [routes.ts](file:///Users/jax/Dev/voc/app/utils/routes.ts) (rejects external, `//`, `\`, non-string); "Create one" link preserves the pending flow into `/register?redirect=…`.
+- [x] `app/pages/register.vue`: same preserve-and-return handling as login. → Done: honors `?redirect=` after auto-confirmed signup; the flow also survives the email-verification detour (`redirect` rides along in `/verify-email?…`, `emailRedirectTo`, and is honored by [verify-email.vue](file:///Users/jax/Dev/voc/app/pages/verify-email.vue)); "Log in" link preserves the pending flow.
+- [x] `app/app.vue`: hide the bottom nav on the consent route (extend the mechanism that hides it on `PUBLIC_AUTH_PATHS`). → Done: `isFullscreenRoute` = public auth paths **or** consent path; consent keeps its session requirement (guard unchanged), it only shares the full-screen presentation.
 
 #### 4.4 Consent Page `app/pages/oauth/consent.vue`
 

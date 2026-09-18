@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { sanitizeInternalRedirect } from '~/utils/routes'
+
 useHead({ title: 'Check your inbox — Voc' })
 
 const route = useRoute()
@@ -11,6 +13,8 @@ const errorMessage = ref<string | null>(null)
 const email = computed(() =>
   typeof route.query.email === 'string' ? route.query.email : undefined,
 )
+// Pending internal flow (e.g. OAuth consent) carried through registration.
+const redirectTarget = computed(() => sanitizeInternalRedirect(route.query.redirect))
 
 onMounted(async () => {
   // Case 1: email-verification link with a token_hash (PKCE-style callback).
@@ -23,7 +27,7 @@ onMounted(async () => {
       return
     }
     status.value = 'verified'
-    await navigateTo('/')
+    await navigateTo(redirectTarget.value ?? '/')
     return
   }
 
@@ -32,7 +36,7 @@ onMounted(async () => {
   const { data } = await supabase.auth.getSession()
   if (data.session) {
     status.value = 'verified'
-    await navigateTo('/')
+    await navigateTo(redirectTarget.value ?? '/')
     return
   }
 

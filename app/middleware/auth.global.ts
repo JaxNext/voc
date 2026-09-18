@@ -13,6 +13,12 @@ export default defineNuxtRouteMiddleware(to => {
 
   const user = useSupabaseUser()
   if (!user.value) {
+    // OAuth consent flow: carry the full consent URL (including the
+    // authorization_id) through /login so the third-party flow resumes after
+    // authentication (design §7.1). login.vue validates the redirect target.
+    if (to.path === OAUTH_CONSENT_PATH) {
+      return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
+    }
     return navigateTo('/login')
   }
 })
